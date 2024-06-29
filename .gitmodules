@@ -1,0 +1,6 @@
+[submodule "sllidar_ros2"]
+	path = sllidar_ros2
+	url = git@github.com:Slamtec/sllidar_ros2.git
+[submodule "yolov8_ros"]
+	path = yolov8_ros
+	url = git@git@github.com:mgonzs13/yolov8_ros.git

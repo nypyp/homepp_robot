@@ -114,7 +114,8 @@ class YOLOTracker(LifecycleNode):
             self.tracked_person_distance = tracked_distance
             self.get_logger().info(f"Tracking person with ID: {self.tracked_person_id} and distance: {self.tracked_person_distance}")
 
-            angle_x = (tracked_person.bbox.center.position.x - depth_image.shape[1] / 2) * tracked_distance / 1000
+            # angle_x = (tracked_person.bbox.center.position.x - depth_image.shape[1] / 2) * tracked_distance / 1000
+            angle_x = tracked_person.bbox.center.position.x - 320.0
             angle_y = (tracked_person.bbox.center.position.y - depth_image.shape[0] / 2) * tracked_distance / 1000
             self.get_logger().info(f"Calculated angles - X: {angle_x}, Y: {angle_y}")
 

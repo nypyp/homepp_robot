@@ -23,6 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'homepp_manager = homepp_start.homepp_manager:main',
         ],
     },
 )

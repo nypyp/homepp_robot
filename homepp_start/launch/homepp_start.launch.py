@@ -6,6 +6,8 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription,DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
+
 
 def generate_launch_description():
     
@@ -36,30 +38,66 @@ def generate_launch_description():
                          }.items(),
     )
 
-    # 声明node2的输出启动参数
-    tracker_log_level_arg = DeclareLaunchArgument(
-        'log_level',
-        default_value='warn',
-        description='Set the log leverl for tracker (log, screen)'
-    )
-
-    #homepp_follower starup
-    homepp_follower = IncludeLaunchDescription(
+    # #homepp_follower starup
+    # homepp_follower = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([os.path.join(
+    #         get_package_share_directory('homepp_follower'), 'launch'), 
+    #         '/homepp_follower.launch.py']
+    #     ),
+    # )
+    
+    respeaker_ros2 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('homepp_follower'), 'launch'), 
-            '/homepp_follower.launch.py']
+            get_package_share_directory('respeaker_ros2'), 'launch'), 
+            '/respeaker.launch.py']
         ),
         launch_arguments={
-            'tracker_log_level': LaunchConfiguration('log_level'),
+            'log_level': LaunchConfiguration('log_level'),
         }.items(),
     )
+    
+    
     
     return LaunchDescription([
         turn_on_wheeltec_robot,
         realsense2_camera,
         yolov8_ros,
-        tracker_log_level_arg,
-        homepp_follower,
+        respeaker_ros2,
+        # Node(
+        #     package='homepp_sherpa_onnx',
+        #     namespace='keywordSpotter_from_topic',
+        #     executable='keywordSpotter_from_topic',
+        #     output='log',
+        #     emulate_tty=True
+        # ),
+        # Node(
+        #     package='homepp_doa_follower',
+        #     namespace='doa_follower',
+        #     executable='doa_follower',
+        #     output='log',
+        #     emulate_tty=True
+        # ),
+        # Node(
+        #     package='homepp_start',
+        #     namespace='homepp_manager',
+        #     executable='homepp_manager',
+        #     output='log',
+        #     emulate_tty=True
+        # ),
+        Node(
+            package='homepp_follower',
+            namespace='yolotracker',
+            executable='yoloTracker',
+            output='log',
+            emulate_tty=True,
+        ),
+        # Node(
+        #     package='homepp_sherpa_onnx',
+        #     namespace='speechRecognition_from_topic',
+        #     executable='speechRecognition_from_topic',
+        #     output='screen',
+        #     emulate_tty=True
+        # )
 
     ])
     

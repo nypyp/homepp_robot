@@ -17,7 +17,7 @@ class YOLOFollower(Node):
         qos = QoSProfile(depth=10)
 
         self.max_speed = 0.9
-        self.max_ang_speed = 1.5
+        self.max_ang_speed = 3.14
         self.active=False
         self.i=0
         self.cmdVelPublisher = self.create_publisher( Twist,'/cmd_vel', qos)
@@ -31,9 +31,9 @@ class YOLOFollower(Node):
         self.declare_parameter('PID_angular_p', 0.0)
         self.declare_parameter('PID_angular_i', 0.000)
         self.declare_parameter('PID_angular_d', 0.000)
-        self.declare_parameter('PID_distance_p', 0.0008)
+        self.declare_parameter('PID_distance_p', 0.0003)
         self.declare_parameter('PID_distance_i', 0.00)
-        self.declare_parameter('PID_distance_d', 0.0000)
+        self.declare_parameter('PID_distance_d', 0.0002)
         
         targetDist = self.get_parameter("targetDist").value
         PID_angular_p = self.get_parameter("PID_angular_p").value

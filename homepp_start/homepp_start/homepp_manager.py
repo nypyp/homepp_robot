@@ -35,25 +35,28 @@ class KeywordDirectionManager(Node):
             10)
 
     def keyword_callback(self, msg):
-        self.get_logger().debug('Received keyword: "%s"' % msg.data)
+        self.get_logger().info('Received keyword: "%s"' % msg.data)
         if self.latest_sound_direction is not None:
             self.publish_keyword_direction()
+        
 
     def direction_callback(self, msg):
         self.latest_sound_direction = msg.data
+        self.get_logger().info('Received direction: "%s"' % msg.data)
 
     def rotation_complete_callback(self, msg):
-        if msg.data == "done":
-            self.get_logger().debug('Received rotation complete message: "%s"' % msg.data)
+        if msg.data == "Rotation complete":
+            self.get_logger().info('Received rotation complete message: "%s"' % msg.data)
             # Start the homepp_follower yolofollower package
-            subprocess.run(["ros2", "run", "homepp_follower", "yoloFollower"])
-            self.get_logger().debug('Started homepp_follower yoloFollower package')
+            self.get_logger().info('Started homepp_follower yoloFollower package')
+            # subprocess.Popen(["ros2", "run", "homepp_follower", "yoloFollower"])
+            self.get_logger().info('yoloFollower opened, continuing..')
 
     def publish_keyword_direction(self):
         msg = Int32()
         msg.data = self.latest_sound_direction
         self.keyword_direction_publisher.publish(msg)
-        self.get_logger().debug('Published keyword direction: %d' % msg.data)
+        self.get_logger().info('Published keyword direction: %d' % msg.data)
 
 def main(args=None):
     rclpy.init(args=args)

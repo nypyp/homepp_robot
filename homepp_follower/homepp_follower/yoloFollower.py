@@ -16,8 +16,8 @@ class YOLOFollower(Node):
         super().__init__('yolofollower')
         qos = QoSProfile(depth=10)
 
-        self.max_speed = 0.9
-        self.max_ang_speed = 3.14
+        self.max_speed = 0.7
+        self.max_ang_speed = 1.57
         self.active=False
         self.i=0
         self.cmdVelPublisher = self.create_publisher( Twist,'/cmd_vel', qos)
@@ -27,10 +27,10 @@ class YOLOFollower(Node):
         #PID_param = rospy.get_param('~PID_controller')
         # the first parameter is the angular target (0 degrees always) the second is the target distance (say 1 meter)
         # self.PID_controller = simplePID([0, targetDist], [1.2 ,0.2 ], [0 ,0.00], [0.005 ,0.00])
-        self.declare_parameter('targetDist', 2500)
-        self.declare_parameter('PID_angular_p', 0.0)
+        self.declare_parameter('targetDist', 2000)
+        self.declare_parameter('PID_angular_p', 0.005)
         self.declare_parameter('PID_angular_i', 0.000)
-        self.declare_parameter('PID_angular_d', 0.000)
+        self.declare_parameter('PID_angular_d', 0.0055)
         self.declare_parameter('PID_distance_p', 0.0003)
         self.declare_parameter('PID_distance_i', 0.00)
         self.declare_parameter('PID_distance_d', 0.0002)
@@ -96,7 +96,7 @@ class YOLOFollower(Node):
         velocity.angular.x = 0.0
         velocity.angular.y = 0.0
         velocity.angular.z = angularSpeed
-        if((distance>4000)or((distance==0))):
+        if((distance>9000)or((distance==0))):
             self.stopMoving()
             self.get_logger().info(f"out of tracking, distance: {distance}")
         else:

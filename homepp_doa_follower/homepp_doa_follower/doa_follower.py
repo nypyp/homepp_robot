@@ -52,7 +52,7 @@ class PID:
 class RotateToSoundSourceNode(Node):
     def __init__(self):
         super().__init__('rotate_to_sound_source_node')
-        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
         self.sound_subscription = self.create_subscription(
             Int32,
             '/keyword_direction',
@@ -63,7 +63,7 @@ class RotateToSoundSourceNode(Node):
             '/imu/data',
             self.imu_callback,
             10)
-        self.rotation_complete_pub = self.create_publisher(String, 'rotation_complete', 10)  # New publisher for rotation complete
+        self.rotation_complete_pub = self.create_publisher(String, '/rotation_complete', 10)  # New publisher for rotation complete
         self.sound_subscription  # prevent unused variable warning
         self.imu_subscription  # prevent unused variable warning
         self.pid = PID()
@@ -91,6 +91,8 @@ class RotateToSoundSourceNode(Node):
             self.sound_source_angle = self.sound_source_angle + 2 * np.pi
         self.pid.SetPoint = self.sound_source_angle
         self.rotation_started = True  # Set the flag to True when received sound source angle
+        self.get_logger().debug(f'Get sound source: {self.sound_source_angle}, Start rotating...')
+
 
         # Log the sound source angle
         # self.get_logger().debug(f'Sound source angle: {self.sound_source_angle}')
@@ -119,18 +121,19 @@ class RotateToSoundSourceNode(Node):
             if abs(self.sound_source_angle - self.current_orientation) <= 0.01:
                 self.rotation_started = False  # Set the flag to False when rotation is complete
                 self.rotation_complete_pub.publish(String(data='Rotation complete'))  # Publish a message to the new topic
+                self.get_logger().debug('Done, stop!')
             if self.sound_source_angle < self.current_orientation:
                 twist.angular.z = - rotation_speed
             else:
                 twist.angular.z =  rotation_speed
 
             self.publisher_.publish(twist)
-            self.get_logger().debug(f'speed: {twist.angular.z:.6f},Current orientation: {self.current_orientation:.6f},Sound source angle: {self.sound_source_angle:.6f}')
+            # self.get_logger().debug(f'speed: {twist.angular.z:.6f},Current orientation: {self.current_orientation:.6f},Sound source angle: {self.sound_source_angle:.6f}')
 
-        rotation_speed = 0.0
-        twist.angular.z = rotation_speed
-        self.publisher_.publish(twist)
-        # self.get_logger().debug('Done!')
+        else:
+            rotation_speed = 0.0
+            twist.angular.z = rotation_speed
+            self.publisher_.publish(twist)
         
         # Log the rotation speed
 

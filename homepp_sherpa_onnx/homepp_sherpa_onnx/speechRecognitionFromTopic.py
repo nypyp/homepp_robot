@@ -18,7 +18,7 @@ recording_results = ""
 def message_sender():
     global recording_results
     websocket.enableTrace(False)
-    server = "ws://192.168.1.124:8000/voicechat"
+    server = "ws://8.134.150.174:8000/voicechat"
     ws = websocket.WebSocketApp(server)
 
     def on_open(ws):
@@ -40,6 +40,7 @@ def message_sender():
     ws.on_open = on_open
     ws.on_message = on_message
     ws.on_close = on_close
+    print("[INFO] websocket inited...")
 
     ws.run_forever()
 
@@ -83,6 +84,9 @@ class SpeechRecognitionNode(Node):
 
         self.recognizer = None
         self.init_recognizer()
+        self.stream = self.recognizer.create_stream()
+        self.segment_id = 0
+        self.last_result = ''
 
         # Subscriber for audio data
         self.audio_sub = self.create_subscription(AudioData, 'audio', self.audio_callback, 10)
@@ -147,6 +151,7 @@ class SpeechRecognitionNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = SpeechRecognitionNode()
+    print("[INFO] try to start sender...")
     sender = threading.Thread(target=message_sender, name='messageSender')
     sender.start()
     node.main_loop()

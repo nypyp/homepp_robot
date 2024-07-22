@@ -102,6 +102,7 @@ class KeywordsSpotterNode(Node):
         rclpy.spin(self)
 
     def audio_callback(self, msg):
+        # self.get_logger().info('received audio callback')
         samples = np.frombuffer(msg.data, dtype=np.int16).astype('float32') / 32768.0
         self.stream.accept_waveform(self.sample_rate, samples)
         while self.keyword_spotter.is_ready(self.stream):

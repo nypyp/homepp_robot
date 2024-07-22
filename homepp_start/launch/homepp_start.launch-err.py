@@ -11,18 +11,12 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     
+    
     # base startup
     turn_on_wheeltec_robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('turn_on_wheeltec_robot'), 'launch'), 
             '/turn_on_wheeltec_robot.launch.py'])
-    )
-    
-    respeaker_ros2 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('respeaker_ros2'), 'launch'), 
-            '/respeaker.launch.py']
-        )
     )
     
     # Camera startup
@@ -43,27 +37,46 @@ def generate_launch_description():
                          'device'               : 'cuda:0',
                          }.items(),
     )
+
+    # #homepp_follower starup
+    # homepp_follower = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([os.path.join(
+    #         get_package_share_directory('homepp_follower'), 'launch'), 
+    #         '/homepp_follower.launch.py']
+    #     ),
+    # )
+    
+    respeaker_ros2 = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('respeaker_ros2'), 'launch'), 
+            '/respeaker.launch.py']
+        ),
+        launch_arguments={
+            'log_level': LaunchConfiguration('log_level'),
+        }.items(),
+    )
+    
+    
     
     return LaunchDescription([
         turn_on_wheeltec_robot,
-        respeaker_ros2,
         realsense2_camera,
         yolov8_ros,
-        
-        # Node(
-        #     package='homepp_sherpa_onnx',
-        #     namespace='keywordSpotter_from_topic',
-        #     executable='keywordSpotter_from_topic',
-        #     output='screen',
-        #     emulate_tty=True
-        # ),
-        # Node(
-        #     package='homepp_doa_follower',
-        #     namespace='doa_follower',
-        #     executable='doa_follower',
-        #     output='screen',
-        #     emulate_tty=True
-        # ),
+        respeaker_ros2,
+        Node(
+            package='homepp_sherpa_onnx',
+            namespace='keywordSpotter_from_topic',
+            executable='keywordSpotter_from_topic',
+            output='log',
+            emulate_tty=True
+        ),
+        Node(
+            package='homepp_doa_follower',
+            namespace='doa_follower',
+            executable='doa_follower',
+            output='screen',
+            emulate_tty=True
+        ),
         Node(
             package='homepp_start',
             namespace='homepp_manager',
@@ -71,26 +84,20 @@ def generate_launch_description():
             output='log',
             emulate_tty=True
         ),
-        # Node(
-        #     package='homepp_follower',
-        #     namespace='yolotracker',
-        #     executable='yoloTracker',
-        #     output='log',
-        #     emulate_tty=True,
-        # ),
+        Node(
+            package='homepp_follower',
+            namespace='yolotracker',
+            executable='yoloTracker',
+            output='log',
+            emulate_tty=True,
+        ),
+        Node(
+            package='homepp_sherpa_onnx',
+            namespace='speechRecognition_from_topic',
+            executable='speechRecognition_from_topic',
+            output='screen',
+            emulate_tty=True
+        )
 
-        # Node(
-        #     package='homepp_follower',
-        #     namespace='yolofollower',
-        #     executable='yoloFollower',
-        #     output='log',
-        #     emulate_tty=True,
-        # ),
-        # Node(
-        #     package='homepp_sherpa_onnx',
-        #     namespace='speechRecognition_from_topic',
-        #     executable='speechRecognition_from_topic',
-        #     output='screen',
-        #     emulate_tty=True
-        # ),
     ])
+    

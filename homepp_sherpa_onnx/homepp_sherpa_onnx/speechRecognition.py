@@ -18,7 +18,7 @@ recording_results = ""
 def message_sender():
     global recording_results
     websocket.enableTrace(False)
-    server = "ws://192.168.1.124:8000/voicechat"
+    server = "wss://www.jianhuguide.top:8000/voicechat"
     ws = websocket.WebSocketApp(server)
 
     def on_open(ws):
@@ -66,7 +66,7 @@ class SpeechRecognitionNode(Node):
         self.declare_parameter('hotwords_file', '')
         self.declare_parameter('hotwords_score', 1.5)
         self.declare_parameter('blank_penalty', 0.0)
-        self.declare_parameter('device_name', 'plughw:0,0')
+        self.declare_parameter('device_name', 'plughw:1,0')
 
         self.args = {
             'tokens': self.get_parameter('tokens').value,

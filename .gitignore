@@ -4,3 +4,10 @@ wheeltec*
 VINS-Fusion-ROS2
 imu_d435i_tpicecho.txt
 imu_euroc_topicecho.txt
+
+homepp_sherpa_onnx/kws-zipformer-wenetspeech
+homepp_sherpa_onnx/streaming-zipformer-bil
+
+
+
+*.tar.gz

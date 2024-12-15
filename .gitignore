@@ -11,3 +11,6 @@ homepp_sherpa_onnx/streaming-zipformer-bil
 
 
 *.tar.gz
+yolov8_ros_tensorrt/engines/best.onnx
+yolov8_ros_tensorrt/engines/yolov7tiny_14cls_end2end.engine
+yolov8_ros_tensorrt/engines/yolov7tiny_14cls_end2end1.engine

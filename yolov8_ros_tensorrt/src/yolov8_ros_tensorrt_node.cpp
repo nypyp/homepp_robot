@@ -12,24 +12,24 @@
 #include "chrono"
 #include "rclcpp/qos.hpp"
 
-const std::vector<std::string> CLASS_NAMES = {
-    "person",         "bicycle",    "car",           "motorcycle",    "airplane",     "bus",           "train",
-    "truck",          "boat",       "traffic light", "fire hydrant",  "stop sign",    "parking meter", "bench",
-    "bird",           "cat",        "dog",           "horse",         "sheep",        "cow",           "elephant",
-    "bear",           "zebra",      "giraffe",       "backpack",      "umbrella",     "handbag",       "tie",
-    "suitcase",       "frisbee",    "skis",          "snowboard",     "sports ball",  "kite",          "baseball bat",
-    "baseball glove", "skateboard", "surfboard",     "tennis racket", "bottle",       "wine glass",    "cup",
-    "fork",           "knife",      "spoon",         "bowl",          "banana",       "apple",         "sandwich",
-    "orange",         "broccoli",   "carrot",        "hot dog",       "pizza",        "donut",         "cake",
-    "chair",          "couch",      "potted plant",  "bed",           "dining table", "toilet",        "tv",
-    "laptop",         "mouse",      "remote",        "keyboard",      "cell phone",   "microwave",     "oven",
-    "toaster",        "sink",       "refrigerator",  "book",          "clock",        "vase",          "scissors",
-    "teddy bear",     "hair drier", "toothbrush"};
-
 // const std::vector<std::string> CLASS_NAMES = {
-//     "sofa", "cabinet", "table", "chair", "closestool", "door", "bed", "washer", "refrigerator",
-//     "bottle", "cup", "shoes", "tissue", "cellphone"
-// };
+//     "person",         "bicycle",    "car",           "motorcycle",    "airplane",     "bus",           "train",
+//     "truck",          "boat",       "traffic light", "fire hydrant",  "stop sign",    "parking meter", "bench",
+//     "bird",           "cat",        "dog",           "horse",         "sheep",        "cow",           "elephant",
+//     "bear",           "zebra",      "giraffe",       "backpack",      "umbrella",     "handbag",       "tie",
+//     "suitcase",       "frisbee",    "skis",          "snowboard",     "sports ball",  "kite",          "baseball bat",
+//     "baseball glove", "skateboard", "surfboard",     "tennis racket", "bottle",       "wine glass",    "cup",
+//     "fork",           "knife",      "spoon",         "bowl",          "banana",       "apple",         "sandwich",
+//     "orange",         "broccoli",   "carrot",        "hot dog",       "pizza",        "donut",         "cake",
+//     "chair",          "couch",      "potted plant",  "bed",           "dining table", "toilet",        "tv",
+//     "laptop",         "mouse",      "remote",        "keyboard",      "cell phone",   "microwave",     "oven",
+//     "toaster",        "sink",       "refrigerator",  "book",          "clock",        "vase",          "scissors",
+//     "teddy bear",     "hair drier", "toothbrush"};
+
+const std::vector<std::string> CLASS_NAMES = {
+    "sofa", "cabinet", "table", "chair", "closestool", "door", "bed", "washer", "refrigerator",
+    "bottle", "cup", "shoes", "tissue", "cellphone"
+};
 
 const std::vector<std::vector<unsigned int>> COLORS = {
     {0, 114, 189},   {217, 83, 25},   {237, 177, 32},  {126, 47, 142},  {119, 172, 48},  {77, 190, 238},
@@ -55,7 +55,7 @@ public:
         this->declare_parameter<int>("image_height", 640);
         this->declare_parameter<float>("score_threshold", 0.50f);
         this->declare_parameter<float>("iou_threshold", 0.65f);
-        this->declare_parameter<std::string>("model_path", "/home/nx/ros2_ws/src/yolov8_ros_tensorrt/engines/yolov8m_end2end.engine");
+        this->declare_parameter<std::string>("model_path", "/home/nx/ros2_ws/src/yolov8_ros_tensorrt/engines/yolov7_tiny.engine");
 
         this->get_parameter("model_path", model_path);
         this->get_parameter("image_width", image_width);
@@ -70,7 +70,7 @@ public:
     on_configure(const rclcpp_lifecycle::State&) {
         RCLCPP_INFO(this->get_logger(), "Configuring");
         cudaSetDevice(0);
-        yolov8 = new YOLOv8(model_path);
+        yolov8 = new YOLOv7(model_path);
         yolov8->make_pipe(true);
         auto qos = rclcpp::QoS(rclcpp::KeepLast(10));
         qos.reliable(); // 设置为可靠的传输
@@ -111,7 +111,7 @@ public:
 
 private:
     void image_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-        RCLCPP_INFO(this->get_logger(), "Received an image, processing...");
+        RCLCPP_DEBUG(this->get_logger(), "Received an image, processing...");
         if (this->get_current_state().id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
             cv::Mat cv_image = cv_bridge::toCvCopy(msg, "bgr8")->image;
             cv::Mat res;
@@ -126,7 +126,7 @@ private:
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
                 RCLCPP_INFO(this->get_logger(), "Inference time: %ld ms", duration);
                 yolov8->draw_objects(cv_image, res, objs, CLASS_NAMES, COLORS);
-                cv::imwrite("/home/nx/ros2_ws/output.jpg", res);
+                // cv::imwrite("/home/nx/ros2_ws/output.jpg", res);
                 sensor_msgs::msg::Image::SharedPtr out_msg = cv_bridge::CvImage(msg->header, "bgr8", res).toImageMsg();
                 image_publisher_->publish(*out_msg);
             } catch (const cv_bridge::Exception& e) {
@@ -157,7 +157,7 @@ private:
 
                 detection_array.detections.push_back(detection);
             }
-            RCLCPP_INFO(this->get_logger(), "检测到的对象数量：%zu", objs.size());
+            // RCLCPP_INFO(this->get_logger(), "检测到的对象数量：%zu", objs.size());
             publisher_->publish(detection_array);
         }
     }
@@ -167,7 +167,7 @@ private:
     int image_height;
     float score_threshold;
     float iou_threshold;
-    YOLOv8* yolov8;
+    YOLOv7* yolov8;
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
     rclcpp::Publisher<yolov8_msgs::msg::DetectionArray>::SharedPtr publisher_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_publisher_;

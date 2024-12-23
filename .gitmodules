@@ -4,3 +4,6 @@
 [submodule "yolov8_ros"]
 	path = yolov8_ros
 	url = git@git@github.com:mgonzs13/yolov8_ros.git
+[submodule "yolo_ros"]
+	path = yolo_ros
+	url = git@git@github.com:mgonzs13/yolo_ros.git
